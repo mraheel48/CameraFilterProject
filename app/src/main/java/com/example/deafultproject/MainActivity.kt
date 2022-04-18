@@ -7,23 +7,27 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.example.deafultproject.filter.DuotoneFilterNew
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.otaliastudios.cameraview.*
 import com.otaliastudios.cameraview.controls.Facing
 import com.otaliastudios.cameraview.controls.Mode
 import com.otaliastudios.cameraview.controls.Preview
 import com.otaliastudios.cameraview.filter.Filters
+import com.otaliastudios.cameraview.filter.MultiFilter
+import com.otaliastudios.cameraview.filters.DuotoneFilter
+import com.otaliastudios.cameraview.filters.SaturationFilter
 import com.otaliastudios.cameraview.frame.Frame
 import com.otaliastudios.cameraview.frame.FrameProcessor
 import java.io.ByteArrayOutputStream
 import java.io.File
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+class MainActivity : AppCompatActivity(), View.OnClickListener, OptionView.Callback {
 
     companion object {
         private val LOG = CameraLogger.create("DemoApp")
-        private const val USE_FRAME_PROCESSOR = false
-        private const val DECODE_BITMAP = false
+        private const val USE_FRAME_PROCESSOR: Boolean = true
+        private const val DECODE_BITMAP: Boolean = false
     }
 
 
@@ -41,6 +45,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         CameraLogger.setLogLevel(CameraLogger.LEVEL_VERBOSE)
         camera.setLifecycleOwner(this)
         camera.addCameraListener(Listener())
+        //camera.setGrid(Grid.DRAW_PHI);
 
         if (USE_FRAME_PROCESSOR) {
             camera.addFrameProcessor(object : FrameProcessor {
@@ -87,7 +92,64 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         findViewById<View>(R.id.captureVideo).setOnClickListener(this)
         findViewById<View>(R.id.captureVideoSnapshot).setOnClickListener(this)
         findViewById<View>(R.id.toggleCamera).setOnClickListener(this)
-        findViewById<View>(R.id.changeFilter).setOnClickListener(this)
+        findViewById/*val group = controlPanel.getChildAt(0) as ViewGroup
+        val watermark = findViewById<View>(R.id.watermark)
+        val options: List<Option<*>> = listOf(
+            // Layout
+            Option.Width(), Option.Height(),
+            // Engine and preview
+            Option.Mode(), Option.Engine(), Option.Preview(),
+            // Some controls
+            Option.Flash(), Option.WhiteBalance(), Option.Hdr(),
+            Option.PictureMetering(), Option.PictureSnapshotMetering(),
+            Option.PictureFormat(),
+            // Video recording
+            Option.PreviewFrameRate(), Option.VideoCodec(), Option.Audio(), Option.AudioCodec(),
+            // Gestures
+            Option.Pinch(), Option.HorizontalScroll(), Option.VerticalScroll(),
+            Option.Tap(), Option.LongTap(),
+            // Watermarks
+            Option.OverlayInPreview(watermark),
+            Option.OverlayInPictureSnapshot(watermark),
+            Option.OverlayInVideoSnapshot(watermark),
+            // Frame Processing
+            Option.FrameProcessingFormat(),
+            // Other
+            Option.Grid(), Option.GridColor(), Option.UseDeviceOrientation()
+        )
+        val dividers = listOf(
+            // Layout
+            false, true,
+            // Engine and preview
+            false, false, true,
+            // Some controls
+            false, false, false, false, false, true,
+            // Video recording
+            false, false, false, true,
+            // Gestures
+            false, false, false, false, true,
+            // Watermarks
+            false, false, true,
+            // Frame Processing
+            true,
+            // Other
+            false, false, true
+        )
+        for (i in options.indices) {
+            val view = OptionView<Any>(this)
+            view.setOption(options[i] as Option<Any>, this)
+            view.setHasDivider(dividers[i])
+            group.addView(
+                view,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }*/<View>(R.id.changeFilter).setOnClickListener(this)
+
+
+        controlPanel.viewTreeObserver.addOnGlobalLayoutListener {
+            BottomSheetBehavior.from(controlPanel).state = BottomSheetBehavior.STATE_HIDDEN
+        }
     }
 
     private inner class Listener : CameraListener() {
@@ -248,7 +310,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         if (camera.preview != Preview.GL_SURFACE) return run {
             message("Filters are supported only when preview is Preview.GL_SURFACE.", true)
         }
-        if (currentFilter < allFilters.size - 1) {
+
+
+        /*if (currentFilter < allFilters.size - 1) {
             currentFilter++
         } else {
             currentFilter = 0
@@ -257,13 +321,46 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         message(filter.toString(), false)
 
         // Normal behavior:
-        camera.filter = filter.newInstance()
+        camera.filter = filter.newInstance()*/
+
+        //val duotone = SaturationFilter()
+        /* duotone.firstColor = Color.GREEN
+         duotone.secondColor = Color.RED*/
+        /*try {
+            val duotone = LomoishFilter()
+
+            camera.filter = MultiFilter(duotone)
+        } catch (ex: AndroidRuntimeException) {
+            ex.printStackTrace()
+        }*/
+        val duotone = DuotoneFilterNew()
+        camera.filter = MultiFilter(duotone)
+
+        //camera.setFilter(Filters.);
 
         // To test MultiFilter:
         // DuotoneFilter duotone = new DuotoneFilter();
         // duotone.setFirstColor(Color.RED);
         // duotone.setSecondColor(Color.GREEN);
         // camera.setFilter(new MultiFilter(duotone, filter.newInstance()));
+    }
+
+    override fun <T : Any> onValueChanged(option: Option<T>, value: T, name: String): Boolean {
+        if (option is Option.Width || option is Option.Height) {
+            val preview = camera.preview
+            val wrapContent = value as Int == ViewGroup.LayoutParams.WRAP_CONTENT
+            if (preview == Preview.SURFACE && !wrapContent) {
+                message(
+                    "The SurfaceView preview does not support width or height changes. " +
+                            "The view will act as WRAP_CONTENT by default.", true
+                )
+                return false
+            }
+        }
+        option.set(camera, value)
+        BottomSheetBehavior.from(controlPanel).state = BottomSheetBehavior.STATE_HIDDEN
+        message("Changed " + option.name + " to " + name, false)
+        return true
     }
 
 }

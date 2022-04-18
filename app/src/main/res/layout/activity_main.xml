@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:background="#FF444444"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/black"
-    tools:context=".MainActivity">
+    android:layout_height="match_parent">
 
+    <!-- Camera -->
     <com.otaliastudios.cameraview.CameraView
         android:id="@+id/camera"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
+        android:layout_marginBottom="88dp"
         android:keepScreenOn="true"
         app:cameraAudio="on"
         app:cameraAutoFocusMarker="@string/cameraview_default_autofocus_marker"
@@ -27,11 +29,7 @@
         app:cameraGrid="off"
         app:cameraMode="picture"
         app:cameraPlaySounds="true"
-        app:cameraPreview="glSurface"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:cameraPreview="glSurface">
 
         <!-- Watermark -->
         <ImageView
@@ -40,40 +38,19 @@
             android:layout_height="72dp"
             android:layout_gravity="bottom|end"
             android:src="@mipmap/logo_foreground"
+            android:visibility="gone"
             app:layout_drawOnPictureSnapshot="true"
             app:layout_drawOnPreview="true"
             app:layout_drawOnVideoSnapshot="true" />
 
     </com.otaliastudios.cameraview.CameraView>
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/controls"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:elevation="4dp"
-        app:behavior_hideable="true"
-        app:behavior_peekHeight="300dp"
-        app:behavior_skipCollapsed="false"
-        app:layout_behavior="@string/bottom_sheet_behavior"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </androidx.core.widget.NestedScrollView>
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_marginBottom="96dp"
+        android:layout_gravity="bottom|start">
 
         <ImageButton
             android:id="@+id/changeFilter"
@@ -96,23 +73,19 @@
 
     <!-- Controls -->
     <LinearLayout
-        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/colorPrimary"
-        android:orientation="horizontal"
         android:padding="16dp"
-        android:weightSum="4"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent">
+        android:orientation="horizontal"
+        android:background="@color/colorPrimary"
+        android:weightSum="4">
 
         <ImageButton
             android:id="@+id/edit"
             android:layout_width="56dp"
             android:layout_height="56dp"
+            android:visibility="gone"
             android:background="?attr/selectableItemBackgroundBorderless"
             app:srcCompat="@drawable/ic_edit" />
 
@@ -125,6 +98,7 @@
             android:id="@+id/capturePicture"
             android:layout_width="56dp"
             android:layout_height="56dp"
+            android:visibility="gone"
             android:background="?attr/selectableItemBackgroundBorderless"
             app:srcCompat="@drawable/ic_photo" />
 
@@ -137,22 +111,20 @@
             android:id="@+id/capturePictureSnapshot"
             android:layout_width="56dp"
             android:layout_height="56dp"
+            android:orientation="vertical"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:gravity="center"
-            android:orientation="vertical">
-
+            android:gravity="center" >
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_photo" />
-
+                app:srcCompat="@drawable/ic_photo"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SNAP"
                 android:textColor="@android:color/white"
+                android:textStyle="bold"
                 android:textSize="10sp"
-                android:textStyle="bold" />
+                android:text="SNAP"/>
         </LinearLayout>
 
         <Space
@@ -164,6 +136,7 @@
             android:id="@+id/captureVideo"
             android:layout_width="56dp"
             android:layout_height="56dp"
+            android:visibility="gone"
             android:background="?attr/selectableItemBackgroundBorderless"
             app:srcCompat="@drawable/ic_video" />
 
@@ -177,23 +150,38 @@
             android:id="@+id/captureVideoSnapshot"
             android:layout_width="56dp"
             android:layout_height="56dp"
+            android:orientation="vertical"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:gravity="center"
-            android:orientation="vertical">
-
+            android:gravity="center" >
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_video" />
-
+                app:srcCompat="@drawable/ic_video"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SNAP"
                 android:textColor="@android:color/white"
+                android:textStyle="bold"
                 android:textSize="10sp"
-                android:textStyle="bold" />
+                android:text="SNAP"/>
         </LinearLayout>
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Edit -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/controls"
+        android:background="@android:color/white"
+        app:layout_behavior="@string/bottom_sheet_behavior"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="300dp"
+        app:behavior_skipCollapsed="false"
+        android:elevation="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
