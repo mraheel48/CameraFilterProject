@@ -300,10 +300,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, OptionView.Callb
 
     private fun toggleCamera() {
         if (camera.isTakingPicture || camera.isTakingVideo) return
-        when (camera.toggleFacing()) {
-            Facing.BACK -> message("Switched to back camera!", false)
-            Facing.FRONT -> message("Switched to front camera!", false)
-        }
+            when (camera.toggleFacing()) {
+                Facing.BACK -> message("Switched to back camera!", false)
+                Facing.FRONT -> message("Switched to front camera!", false)
+            }
+
     }
 
     private fun changeCurrentFilter() {

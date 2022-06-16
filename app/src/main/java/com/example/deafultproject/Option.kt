@@ -12,6 +12,7 @@ import com.otaliastudios.cameraview.CameraOptions
 import com.otaliastudios.cameraview.CameraView
 import com.otaliastudios.cameraview.gesture.GestureAction
 import com.otaliastudios.cameraview.overlay.OverlayLayout
+import java.util.*
 import kotlin.math.roundToInt
 import kotlin.reflect.KClass
 
@@ -27,7 +28,7 @@ abstract class Option<T: Any>(val name: String) {
     abstract fun set(view: CameraView, value: T)
 
     open fun toString(value: T): String {
-        return "$value".replace("_", "_").toLowerCase()
+        return "$value".replace("_", "_").lowercase(Locale.getDefault())
     }
 
     class Width : Option<Int>("Width") {
